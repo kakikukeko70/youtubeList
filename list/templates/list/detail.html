@@ -1,0 +1,3 @@
+{% for video in playlist.video_set.all %}
+    <p>{{ video }}  ({{ video.channel }})</p>
+{% endfor %}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>list</title>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="link">enter the url link of the public playlist</label>
+        <input type="text" name="link">
+        <button>save</button>
+    </form>
+    <h2>saved list</h2>
+    {% for playlist in playlists%}
+        <p><a href="{% url 'list:detail' playlist.id %}">{{ playlist }}</a></p>
+    {% endfor %}
+</body>
+</html>
