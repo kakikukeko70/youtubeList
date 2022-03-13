@@ -6,31 +6,40 @@ import requests
 
 def index(request):
     if request.method == 'POST':
-        list_url = 'https://www.googleapis.com/youtube/v3/playlistItems'
+        list_url = 'https://www.googleapis.com/youtube/v3/playlists'
+        listItems_url = 'https://www.googleapis.com/youtube/v3/playlistItems'
         link = request.POST['link']
         pl = Playlist(url=link)
 
         list_id = link.replace('https://youtube.com/playlist?list=', '')
         list_id = list_id.replace('https://www.youtube.com/playlist?list=', '')
+
         list_params = {
+            'part': 'snippet',
+            'id' : list_id,
+            'key' : settings.YOUTUBE_DATA_API_KEY,
+        }
+        r = requests.get(list_url, params=list_params)
+        pl.title = r.json()['items'][0]['snippet']['title']
+
+        listItems_params = {
             'part': 'snippet',
             'playlistId' : list_id,
             'key' : settings.YOUTUBE_DATA_API_KEY,
         }
-        r = requests.get(list_url, params=list_params)
+        r = requests.get(listItems_url, params=listItems_params)
         nums = r.json()['pageInfo']['totalResults']
 
-        list_params = {
+        listItems_params = {
             'part': 'snippet',
             'playlistId' : list_id,
             'maxResults' : nums,
             'key' : settings.YOUTUBE_DATA_API_KEY,
         }
         
-        r = requests.get(list_url, params=list_params)
+        r = requests.get(listItems_url, params=listItems_params)
         results = r.json()['items']
         
-
         pl.save()
         for result in results:
             video = Video(title=result['snippet']['title'], channel=result['snippet']['videoOwnerChannelTitle'], playlist=pl)
